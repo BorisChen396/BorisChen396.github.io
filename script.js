@@ -1,8 +1,10 @@
+var cors_proxy = "https://cors-anywhere.herokuapp.com/";
 var video_id = "";
 var file = ""
 var fileContent = "null";
 var playerResponse;
 var fileReader = new XMLHttpRequest();
+var thumbnail = [];
 
 function main() {
     var link = document.getElementById("video-id").value;
@@ -13,8 +15,7 @@ function main() {
         link = ((link.split("v="))[1].split("&"))[0];
     };
     video_id = link;
-    file = "https://cors-anywhere.herokuapp.com/https://www.youtube.com/get_video_info?eurl=" + 
-            encodeURIComponent(window.location) + "&sts=18421&video_id=" + video_id;
+    file = cors_proxy + "https://www.youtube.com/get_video_info?eurl=" + encodeURIComponent(window.location) + "&sts=18421&video_id=" + video_id;
     fileReader.open("GET", file, true);
     fileReader.onreadystatechange = function() {
         if(fileReader.readyState === 4) {
@@ -39,8 +40,12 @@ function main() {
                 while(obj.description.indexOf("+") != -1) {
                     obj.description = obj.description.replace("+", " ");
                 };
+                while(playerResponse.videoDetails.author.indexOf("+") != -1) {
+                    playerResponse.videoDetails.author = playerResponse.videoDetails.author.replace("+", " ");
+                };
                 document.title = obj.title;
                 document.getElementById("output").innerHTML = "<h2>" + obj.title + "</h2>" + "<br/>" + obj.description;
+                setMediaSession(obj.title, playerResponse.videoDetails.author);
             }
         }
     }
@@ -75,4 +80,38 @@ function lookComponent() {
             return obj;
         };
     };
+}
+
+function setMediaSession(videoTitle, videoAuthor) {
+    for(i = 0; i < playerResponse.videoDetails.thumbnail.thumbnails.length; i++) {
+        thumbnail[i] = {};
+        thumbnail[i].src = playerResponse.videoDetails.thumbnail.thumbnails[i].url;
+        thumbnail[i].sizes = playerResponse.videoDetails.thumbnail.thumbnails[i].width + 'x' + 
+                             playerResponse.videoDetails.thumbnail.thumbnails[i].height;
+        thumbnail[i].type = 'image/jpg';
+    };
+    console.log(thumbnail);
+    if ('mediaSession' in navigator) {
+        navigator.mediaSession.metadata = new MediaMetadata({
+          title: videoTitle,
+          artist: videoAuthor,
+          album: '',
+          artwork: thumbnail
+        });
+      
+        navigator.mediaSession.setActionHandler('play', function() {
+            document.getElementById("youtube-player").play();
+        });
+        navigator.mediaSession.setActionHandler('pause', function() {
+            document.getElementById("youtube-player").pause();
+        });
+        navigator.mediaSession.setActionHandler('seekbackward', function() {
+            document.getElementById("youtube-player").currentTime += -5;
+        });
+        navigator.mediaSession.setActionHandler('seekforward', function() {
+            document.getElementById("youtube-player").currentTime += 5;
+        });
+        /*navigator.mediaSession.setActionHandler('previoustrack', function() {});
+        navigator.mediaSession.setActionHandler('nexttrack', function() {});*/
+      }
 }
