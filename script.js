@@ -9,7 +9,7 @@ var thumbnail = [];
 function main() {
     var link = document.getElementById("video-id").value;
     if(link.indexOf("youtu.be") != -1) {
-        link = ((link.split("/"))[1].split("&"))[0];
+        link = ((link.split("youtu.be/"))[1].split("&"))[0];
     }
     else {
         link = ((link.split("v="))[1].split("&"))[0];
