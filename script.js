@@ -90,7 +90,6 @@ function setMediaSession(videoTitle, videoAuthor) {
                              playerResponse.videoDetails.thumbnail.thumbnails[i].height;
         thumbnail[i].type = 'image/jpg';
     };
-    console.log(thumbnail);
     if ('mediaSession' in navigator) {
         navigator.mediaSession.metadata = new MediaMetadata({
           title: videoTitle,
