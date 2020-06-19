@@ -1,16 +1,15 @@
 <html>
-    <body>
+    <body style="overflow-y: hidden;">
+        <script src="script.js"></script>
         <video id="youtube-player" controls autoplay>
             <source id="youtube-src"></source>
         </video>
         <p>
-            <input id="video-id" style="width: 500px;"></input>
-            <button onclick="main();">run!</button>
-            <p id="output" style="word-break: break-all;">
+            <input id="video-id" style="width: 500px;" value="https://youtu.be/1ro1ktQpE6o"></input>
+            <button onclick="playMusic(document.getElementById('video-id').value);">run!</button>
+            <p id="title" style="word-break: break-all;">
             </p>
+            <div id="description" style="position: fixed; overflow-y: scroll; top: 45%; bottom: 5%; width: 60%;"></div>
         </p>
-        <script id="receive-data"></script>
-        <script src="jquery-3.5.1.js"></script>
-        <script src="script.js"></script>
     </body>
 </html>

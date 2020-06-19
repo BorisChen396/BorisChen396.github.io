@@ -1,4 +1,5 @@
 var cors_proxy = "https://cors-anywhere.herokuapp.com/";
+var get_video_info = ["https://www.youtube.com/get_video_info?html5=1&video_id=","&cpn=YHprHKXDXJnD3SuD&eurl&el=embedded&hl=zh_TW&sts=18428&lact=5&c=WEB_EMBEDDED_PLAYER&cver=20200618&cplayer=UNIPLAYER&cbr=Chrome&cbrver=83.0.4103.106&cos=Windows&cosver=10.0&width=982&height=674&authuser=0&ei=h-DsXq2lBpahlQSgpqmgDw&iframe=1&embed_config=%7B%7D"]
 var video_id = "";
 var file = ""
 var fileContent = "null";
@@ -6,16 +7,15 @@ var playerResponse;
 var fileReader = new XMLHttpRequest();
 var thumbnail = [];
 
-function main() {
-    var link = document.getElementById("video-id").value;
+function playMusic(link) {
     if(link.indexOf("youtu.be") != -1) {
-        link = ((link.split("youtu.be/"))[1].split("&"))[0];
+        link = link.split("youtu.be/")[1].split("&")[0];
     }
     else {
-        link = ((link.split("v="))[1].split("&"))[0];
+        link = link.split("v=")[1].split("&")[0];
     };
     video_id = link;
-    file = cors_proxy + "https://www.youtube.com/get_video_info?eurl=" + encodeURIComponent(window.location) + "&sts=18421&video_id=" + video_id;
+    file = cors_proxy + get_video_info[0] + video_id + get_video_info[1];
     fileReader.open("GET", file, true);
     fileReader.onreadystatechange = function() {
         if(fileReader.readyState === 4) {
@@ -44,7 +44,8 @@ function main() {
                     playerResponse.videoDetails.author = playerResponse.videoDetails.author.replace("+", " ");
                 };
                 document.title = obj.title;
-                document.getElementById("output").innerHTML = "<h2>" + obj.title + "</h2>" + "<br/>" + obj.description;
+                document.getElementById("title").innerHTML = "<h2>" + obj.title + "</h2>";
+                document.getElementById("description").innerHTML = obj.description;
                 setMediaSession(obj.title, playerResponse.videoDetails.author);
             }
         }
@@ -52,8 +53,31 @@ function main() {
     fileReader.send(null);
 }
 
-function download() {
-    document.getElementById("receive-data").src = "https://www.youtube.com/get_video_info?video_id=Cy1wYBFkakI";
+function decipher(num) {
+    var s = decodeURIComponent(playerResponse.streamingData.adaptiveFormats[num].signatureCipher.split("&")[0].split("s=")[1]);
+    var url = decodeURIComponent(playerResponse.streamingData.adaptiveFormats[num].signatureCipher.split("&")[2].split("url=")[1]);
+    var Ew = function(a) {
+        a = a.split("");
+        Dw.th(a, 1);
+        Dw.R5(a, 65);
+        Dw.hG(a, 18);
+        Dw.hG(a, 59);
+        return a.join("")
+    };
+    var Dw = {
+        R5: function(a) {
+            a.reverse()
+        },
+        th: function(a, b) {
+            a.splice(0, b)
+        },
+        hG: function(a, b) {
+            var c = a[0];
+            a[0] = a[b % a.length];
+            a[b % a.length] = c
+        }
+    };
+    return (url + "&sig=" + encodeURIComponent(Ew(s)));
 }
 
 function decode(content) {
@@ -68,15 +92,19 @@ function decode(content) {
 function lookComponent() {
     for(i = 0; i < playerResponse.streamingData.adaptiveFormats.length; i++) {
         if(playerResponse.streamingData.adaptiveFormats[i].audioQuality == "AUDIO_QUALITY_MEDIUM") {
-            if  (playerResponse.streamingData.adaptiveFormats[i].signatureCipher != undefined ||
-                 playerResponse.streamingData.adaptiveFormats[i].url == undefined) {
-                     alert("無法解析已加密影片");
-                     return -1;
-                 };
-            var obj = {"url": playerResponse.streamingData.adaptiveFormats[i].url, 
-            "type": playerResponse.streamingData.adaptiveFormats[i].mimeType,
-            "title": playerResponse.videoDetails.title,
-            "description": playerResponse.videoDetails.shortDescription};
+            var obj = {"url": null, 
+            "type": null,
+            "title": null, 
+            "description": null};
+            if  (playerResponse.streamingData.adaptiveFormats[i].signatureCipher != undefined) {
+                obj.url = decipher(i);
+            }
+            else {
+                obj.url = playerResponse.streamingData.adaptiveFormats[i].url;
+            };
+            obj.type = playerResponse.streamingData.adaptiveFormats[i].mimeType;
+            obj.title =  playerResponse.videoDetails.title;
+            obj.description = playerResponse.videoDetails.shortDescription;
             return obj;
         };
     };
