@@ -1,5 +1,6 @@
 var cors_proxy = "https://cors-anywhere.herokuapp.com/";
-var get_video_info = ["https://www.youtube.com/get_video_info?html5=1&video_id=","&cpn=YHprHKXDXJnD3SuD&eurl&el=embedded&hl=zh_TW&sts=18428&lact=5&c=WEB_EMBEDDED_PLAYER&cver=20200618&cplayer=UNIPLAYER&cbr=Chrome&cbrver=83.0.4103.106&cos=Windows&cosver=10.0&width=982&height=674&authuser=0&ei=h-DsXq2lBpahlQSgpqmgDw&iframe=1&embed_config=%7B%7D"]
+var get_video_info = "https://www.youtube.com/get_video_info?eurl=" + encodeURIComponent(window.location) + 
+                     "&sts=18432&html5=1&video_id=";
 var video_id = "";
 var file = ""
 var fileContent = "null";
@@ -15,7 +16,7 @@ function playMusic(link) {
         link = link.split("v=")[1].split("&")[0];
     };
     video_id = link;
-    file = cors_proxy + get_video_info[0] + video_id + get_video_info[1];
+    file = cors_proxy + get_video_info + video_id;
     fileReader.open("GET", file, true);
     fileReader.onreadystatechange = function() {
         if(fileReader.readyState === 4) {
@@ -28,6 +29,9 @@ function playMusic(link) {
                 var obj = lookComponent();
                 if(obj == -1) return;
                 document.getElementById("youtube-src").src = obj.url;
+
+                console.log(obj.url);
+
                 document.getElementById("youtube-src").type = obj.type;
                 document.getElementById("youtube-player").load();
                 document.getElementById("youtube-player").play();
@@ -58,20 +62,20 @@ function decipher(num) {
     var url = decodeURIComponent(playerResponse.streamingData.adaptiveFormats[num].signatureCipher.split("&")[2].split("url=")[1]);
     var Ew = function(a) {
         a = a.split("");
-        Dw.th(a, 1);
-        Dw.R5(a, 65);
-        Dw.hG(a, 18);
-        Dw.hG(a, 59);
+        Dw.h3(a, 22);
+        Dw.yE(a, 1);
+        Dw.h3(a, 64);
+        Dw.Qg(a, 28);
         return a.join("")
     };
     var Dw = {
-        R5: function(a) {
+        h3: function(a) {
             a.reverse()
         },
-        th: function(a, b) {
+        yE: function(a, b) {
             a.splice(0, b)
         },
-        hG: function(a, b) {
+        Qg: function(a, b) {
             var c = a[0];
             a[0] = a[b % a.length];
             a[b % a.length] = c
