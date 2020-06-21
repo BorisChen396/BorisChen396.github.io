@@ -238,7 +238,7 @@ var playControl = {
             }
             else{
                 document.getElementById("playlist").innerHTML = document.getElementById("playlist").innerHTML + 
-                                                                "<div class='playlistItem'><a href='' onclick='playControl.play(" + 
+                                                                "<div class='playlistItem'><a style='cursor: pointer' onclick='playControl.play(" + 
                                                                 i + ")'>" + playlist[i] + "</a></div><br/>";
             };
         };
