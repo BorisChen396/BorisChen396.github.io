@@ -179,6 +179,9 @@ var playControl = {
         document.getElementById("title").innerHTML = obj.title;
         if(document.getElementById("title").clientWidth <= document.body.clientWidth*60/100) {
             document.getElementById("title").style = "animation: none";
+        }
+        else {
+            document.getElementById("title").style = "";
         };
         document.getElementById("description").innerHTML = obj.description;
         setMediaSession(obj.title, playerResponse.videoDetails.author);
