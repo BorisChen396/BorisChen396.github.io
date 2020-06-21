@@ -5,8 +5,8 @@ var video_id = "";
 var file = ""
 var fileContent = "null";
 var playerResponse;
-var fileReader = new XMLHttpRequest();
-var thumbnail = [];
+var playlist = [];
+var playArrey;
 
 function playMusic(link) {
     if(link.indexOf("youtu.be") != -1) {
@@ -17,10 +17,12 @@ function playMusic(link) {
     };
     video_id = link;
     file = cors_proxy + get_video_info + video_id;
-    fileReader.open("GET", file, true);
+    var fileReader = new XMLHttpRequest();
+    fileReader.open("GET", file, false);
     fileReader.onreadystatechange = function() {
         if(fileReader.readyState === 4) {
             if(fileReader.status === 200 || fileReader.status == 0) {
+                console.log("Running!");
                 playerResponse = JSON.parse(decode(fileReader.responseText));
                 if(playerResponse.playabilityStatus.status != "OK") {
                     alert(playerResponse.playabilityStatus.reason);
@@ -28,13 +30,6 @@ function playMusic(link) {
                 };
                 var obj = lookComponent();
                 if(obj == -1) return;
-                document.getElementById("youtube-src").src = obj.url;
-
-                console.log(obj.url);
-
-                document.getElementById("youtube-src").type = obj.type;
-                document.getElementById("youtube-player").load();
-                document.getElementById("youtube-player").play();
                 while(obj.title.indexOf("+") != -1) {
                     obj.title = obj.title.replace("+", " ");
                 };
@@ -47,14 +42,19 @@ function playMusic(link) {
                 while(playerResponse.videoDetails.author.indexOf("+") != -1) {
                     playerResponse.videoDetails.author = playerResponse.videoDetails.author.replace("+", " ");
                 };
-                document.title = obj.title;
-                document.getElementById("title").innerHTML = "<h2>" + obj.title + "</h2>";
-                document.getElementById("description").innerHTML = obj.description;
-                setMediaSession(obj.title, playerResponse.videoDetails.author);
+                playArrey = obj;
             }
         }
     }
-    fileReader.send(null);
+    try {
+        fileReader.send(null);
+    }
+    catch(e) {
+        alert("處理連結時發生例外。\nDetail: " + e);
+        console.log(e);
+        return -1;
+    };
+    return playArrey;
 }
 
 function decipher(num) {
@@ -115,6 +115,7 @@ function lookComponent() {
 }
 
 function setMediaSession(videoTitle, videoAuthor) {
+    var thumbnail = [];
     for(i = 0; i < playerResponse.videoDetails.thumbnail.thumbnails.length; i++) {
         thumbnail[i] = {};
         thumbnail[i].src = playerResponse.videoDetails.thumbnail.thumbnails[i].url;
@@ -142,7 +143,66 @@ function setMediaSession(videoTitle, videoAuthor) {
         navigator.mediaSession.setActionHandler('seekforward', function() {
             document.getElementById("youtube-player").currentTime += 5;
         });
-        /*navigator.mediaSession.setActionHandler('previoustrack', function() {});
-        navigator.mediaSession.setActionHandler('nexttrack', function() {});*/
+        navigator.mediaSession.setActionHandler('previoustrack', function() {
+            playControl.prev();
+        });
+        navigator.mediaSession.setActionHandler('nexttrack', function() {
+            playControl.next();
+        });
       }
+}
+
+var playControl = {
+    currentItem: 0,
+    add: function(link) {
+        var a = playlist.length;
+        playlist[a] = link;
+        a == 0 ? this.play(a) : null;
+        this.refresh();
+    },
+    remove: function(item) {
+        for(var i = item; i < playlist.length; i++) {
+            playlist[i] = playlist[i+1];
+        };
+        playlist[playlist.length - 1] = undefined;
+        this.refresh();
+    },
+    play: function(item) {
+        this.currentItem = item;
+        var obj = playMusic(playlist[item]);
+        if(obj == -1) return -1;
+        document.getElementById("youtube-src").src = obj.url;
+        document.getElementById("youtube-src").type = obj.type;
+        document.getElementById("youtube-player").load();
+        document.getElementById("youtube-player").play();
+        document.title = obj.title;
+        document.getElementById("title").innerHTML = obj.title;
+        document.getElementById("description").innerHTML = obj.description;
+        setMediaSession(obj.title, playerResponse.videoDetails.author);
+    },
+    prev: function() {
+        if(this.currentItem == 0) return;
+        var stat = this.play(this.currentItem - 1);
+        if(stat == -1) this.currentItem++;
+    },
+    next: function() {
+        if(this.currentItem == playlist.length - 1) return;
+        var stat = this.play(this.currentItem + 1);
+        if(stat == -1) this.currentItem--;
+    },
+    clear: function() {
+        playlist = [];
+        this.refresh();
+    },
+    refresh: function() {
+        document.getElementById("playlist").innerHTML = "";
+        for(var i = 0; i < playlist.length; i++) {
+            document.getElementById("playlist").innerHTML = document.getElementById("playlist").innerHTML + "<div class='playlistItem'><a href='" + playlist[i] + "'>" + playlist[i] + "</a></div><br/>";
+        };
+    },
+    savePlaylist: function() {
+        var expires = new Date();
+        expires.setTime(expires.getTime + 7*24*60*60*1000);
+        document.cookie = "playlist=" + escape(playlist.toString) + ";expires=" + expires.toGMTString();
+    }
 }

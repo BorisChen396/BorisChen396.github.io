@@ -1,17 +1,24 @@
 <html>
+    <head>
+        <title>YouTube Online Music Player</title>
+        <link type="text/css" rel="stylesheet" href="style.css">
+    </head>
     <body>
         <script src="script.js"></script>
-        <audio id="youtube-player" controls autoplay>
+        <audio id="youtube-player" onended="playControl.next()" controls autoplay>
             <source id="youtube-src"></source>
         </audio>
-        <p>
-            <p id="title" style="width: 60%; word-break: normal;"></p>
-            <p id="description" style="position: relative; height: 75%; width: 60%; overflow-y: scroll;"></p>
-        </p>
+        <div style="width: 60%; ">
+            <div style="white-space : nowrap; overflow: hidden;">
+                <h2 id="title" class="title">
+                </h2>
+            </div>
+            <p id="description" class="description"></p>
+        </div>
         <div style="position: fixed; top: 5px; right: 5px; width: 40%; height: 100%-5px">
-            <input id="video-id" style="position: relative; left: 0%; width: 90%;" value="https://www.youtube.com/watch?v=y5wkebBCwAE"></input>
-            <button onclick="playMusic(document.getElementById('video-id').value);" style="width: 9%;">run!</button>
-            <div id="playlistItem"></div>
+            <input id="video-id" style="height: 22px; position: relative; left: 0%; width: 75%;" value="https://www.youtube.com/watch?v=y5wkebBCwAE"></input>
+            <button onclick="playControl.add(document.getElementById('video-id').value);" style="height: 22px; width: 20%;">run!</button>
+            <div id="playlist" class="playlist"></div>
         </div>
     </body>
 </html>
