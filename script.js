@@ -7,6 +7,7 @@ var fileContent = "null";
 var playerResponse;
 var playlist = [];
 var playArrey;
+var loopMode = 0;
 
 function playMusic(link) {
     if(link.indexOf("youtu.be") != -1) {
@@ -22,7 +23,6 @@ function playMusic(link) {
     fileReader.onreadystatechange = function() {
         if(fileReader.readyState === 4) {
             if(fileReader.status === 200 || fileReader.status == 0) {
-                console.log("Running!");
                 playerResponse = JSON.parse(decode(fileReader.responseText));
                 if(playerResponse.playabilityStatus.status != "OK") {
                     alert(playerResponse.playabilityStatus.reason);
@@ -177,18 +177,50 @@ var playControl = {
         document.getElementById("youtube-player").play();
         document.title = obj.title;
         document.getElementById("title").innerHTML = obj.title;
+        if(document.getElementById("title").clientWidth <= document.body.clientWidth*60/100) {
+            document.getElementById("title").style = "animation: none";
+        };
         document.getElementById("description").innerHTML = obj.description;
         setMediaSession(obj.title, playerResponse.videoDetails.author);
+        this.refresh();
     },
     prev: function() {
         if(this.currentItem == 0) return;
+        var tmpurl = document.getElementById("youtube-src").src;
+        var tmptime = document.getElementById("youtube-player").currentTime;
+        document.getElementById("youtube-player").src = "";
         var stat = this.play(this.currentItem - 1);
-        if(stat == -1) this.currentItem++;
+        if(stat == -1) {
+            playlist[this.currentItem] = undefined;
+            this.currentItem++;
+            document.getElementById("youtube-player").src = tmpurl;
+            document.getElementById("youtube-player").currentTime = tmptime;
+            document.getElementById("youtube-player").play();
+            this.refresh();
+        };
     },
     next: function() {
+        document.getElementById("youtube-src").src = "";
+        if(loopMode == 1) {
+            document.getElementById("youtube-player").currentTime = 0;
+            document.getElementById("youtube-player").play();
+            return;
+        }
+        else if(loopMode == 2 && this.currentItem == playlist.length - 1) {
+            this.currentItem = -1;
+        };
         if(this.currentItem == playlist.length - 1) return;
+        var tmpurl = document.getElementById("youtube-src").src;
+        var tmptime = document.getElementById("youtube-player").currentTime;
         var stat = this.play(this.currentItem + 1);
-        if(stat == -1) this.currentItem--;
+        if(stat == -1) {
+            playlist[this.currentItem] = undefined;
+            this.currentItem--;
+            document.getElementById("youtube-src").src = tmpurl;
+            document.getElementById("youtube-player").currentTime = tmptime;
+            document.getElementById("youtube-player").play();
+            this.refresh();
+        };
     },
     clear: function() {
         playlist = [];
@@ -197,7 +229,15 @@ var playControl = {
     refresh: function() {
         document.getElementById("playlist").innerHTML = "";
         for(var i = 0; i < playlist.length; i++) {
-            document.getElementById("playlist").innerHTML = document.getElementById("playlist").innerHTML + "<div class='playlistItem'><a href='" + playlist[i] + "'>" + playlist[i] + "</a></div><br/>";
+            if(i == this.currentItem) {
+                document.getElementById("playlist").innerHTML = document.getElementById("playlist").innerHTML + 
+                                                                "<i>" + playlist[i] + "</i>";
+            }
+            else{
+                document.getElementById("playlist").innerHTML = document.getElementById("playlist").innerHTML + 
+                                                                "<div class='playlistItem'><a href='' onclick='playControl.play(" + 
+                                                                i + ")'>" + playlist[i] + "</a></div><br/>";
+            };
         };
     },
     savePlaylist: function() {
@@ -205,4 +245,12 @@ var playControl = {
         expires.setTime(expires.getTime + 7*24*60*60*1000);
         document.cookie = "playlist=" + escape(playlist.toString) + ";expires=" + expires.toGMTString();
     }
+}
+
+function loopSwitch() {
+    loopMode++;
+    if(loopMode == 3) loopMode = 0;
+    if(loopMode == 0) document.getElementById("loopSwitch").innerHTML = "none";
+    if(loopMode == 1) document.getElementById("loopSwitch").innerHTML = "single";
+    if(loopMode == 2) document.getElementById("loopSwitch").innerHTML = "queue";
 }
