@@ -181,7 +181,7 @@ var playControl = {
             document.getElementById("title").style = "animation: none";
         }
         else {
-            document.getElementById("title").innerHTML = obj.title + obj.title;
+            document.getElementById("title").innerHTML = "\t" + obj.title + obj.title "\t";
             document.getElementById("title").style = "";
         };
         document.getElementById("description").innerHTML = obj.description;
