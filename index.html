@@ -5,9 +5,22 @@
     </head>
     <body>
         <script src="script.js"></script>
+        <script>
+            function reloadPlayer() {
+                document.getElementById('youtube-player').load();
+                document.getElementById('youtube-player').play();
+            }
+            function addLink() {
+                var link = document.getElementById('video-id').value.split(";");
+                for(var i = 0; i < link.length; i++) {
+                    playControl.add(link[i]);
+                };
+            }
+        </script>
         <audio id="youtube-player" onended="playControl.next()" controls autoplay>
             <source id="youtube-src"></source>
         </audio>
+        <button onclick="reloadPlayer()">reload</button>
         <button id="loopSwitch" onclick="loopSwitch()">none</button>
         <div style="width: 60%; ">
             <div style="white-space : nowrap; overflow: hidden;">
@@ -18,7 +31,7 @@
         </div>
         <div style="position: fixed; top: 5px; right: 5px; width: 40%; height: 100%-5px">
             <input id="video-id" style="height: 22px; position: relative; left: 0%; width: 75%;" value="https://www.youtube.com/watch?v=y5wkebBCwAE"></input>
-            <button onclick="playControl.add(document.getElementById('video-id').value);" style="height: 22px; width: 20%;">run!</button>
+            <button onclick="addLink()" style="height: 22px; width: 20%;">run!</button>
             <div id="playlist" class="playlist"></div>
         </div>
     </body>

@@ -54,6 +54,7 @@ function playMusic(link) {
         console.log(e);
         return -1;
     };
+    playlist[playControl.currentItem] = playArrey;
     return playArrey;
 }
 
@@ -156,7 +157,8 @@ var playControl = {
     currentItem: 0,
     add: function(link) {
         var a = playlist.length;
-        playlist[a] = link;
+        playlist[a] = {};
+        playlist[a].link = link;
         a == 0 ? this.play(a) : null;
         this.refresh();
     },
@@ -168,9 +170,13 @@ var playControl = {
         this.refresh();
     },
     play: function(item) {
+        var tmp = this.currentItem;
         this.currentItem = item;
-        var obj = playMusic(playlist[item]);
-        if(obj == -1) return -1;
+        var obj = (playlist[item].url ? playlist[item] : playMusic(playlist[item].link));
+        if(obj == -1) {
+            this.currentItem = tmp;
+            return -1
+        };
         document.getElementById("youtube-src").src = obj.url;
         document.getElementById("youtube-src").type = obj.type;
         document.getElementById("youtube-player").load();
@@ -235,12 +241,17 @@ var playControl = {
         for(var i = 0; i < playlist.length; i++) {
             if(i == this.currentItem) {
                 document.getElementById("playlist").innerHTML = document.getElementById("playlist").innerHTML + 
-                                                                "<i>" + playlist[i] + "</i>";
+                                                                "<i>" + playlist[i].title + "</i>";
             }
-            else{
+            else if(playlist[i].title){
                 document.getElementById("playlist").innerHTML = document.getElementById("playlist").innerHTML + 
                                                                 "<div class='playlistItem'><a style='cursor: pointer' onclick='playControl.play(" + 
-                                                                i + ")'>" + playlist[i] + "</a></div><br/>";
+                                                                i + ")'>" + playlist[i].title + "</a></div><br/>";
+            }
+            else {
+                document.getElementById("playlist").innerHTML = document.getElementById("playlist").innerHTML + 
+                                                                "<div class='playlistItem'><a style='cursor: pointer' onclick='playControl.play(" + 
+                                                                i + ")'>" + playlist[i].link + "</a></div><br/>";
             };
         };
     },
