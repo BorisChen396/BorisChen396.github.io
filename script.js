@@ -39,8 +39,8 @@ function playMusic(link) {
                 while(obj.description.indexOf("+") != -1) {
                     obj.description = obj.description.replace("+", " ");
                 };
-                while(playerResponse.videoDetails.author.indexOf("+") != -1) {
-                    playerResponse.videoDetails.author = playerResponse.videoDetails.author.replace("+", " ");
+                while(obj.author.indexOf("+") != -1) {
+                    obj.author = obj.author.replace("+", " ");
                 };
                 playArrey = obj;
             }
@@ -100,7 +100,9 @@ function lookComponent() {
             var obj = {"url": null, 
             "type": null,
             "title": null, 
-            "description": null};
+            "author": null,
+            "description": null,
+            "thumbnail": [],};
             if  (playerResponse.streamingData.adaptiveFormats[i].signatureCipher != undefined) {
                 obj.url = decipher(i);
             }
@@ -110,26 +112,26 @@ function lookComponent() {
             obj.type = playerResponse.streamingData.adaptiveFormats[i].mimeType;
             obj.title =  playerResponse.videoDetails.title;
             obj.description = playerResponse.videoDetails.shortDescription;
+            obj.author = playerResponse.videoDetails.author;
+            for(i = 0; i < playerResponse.videoDetails.thumbnail.thumbnails.length; i++) {
+                obj.thumbnail[i] = {};
+                obj.thumbnail[i].src = playerResponse.videoDetails.thumbnail.thumbnails[i].url;
+                obj.thumbnail[i].sizes = playerResponse.videoDetails.thumbnail.thumbnails[i].width + 'x' + 
+                                     playerResponse.videoDetails.thumbnail.thumbnails[i].height;
+                obj.thumbnail[i].type = 'image/jpg';
+            };
             return obj;
         };
     };
 }
 
-function setMediaSession(videoTitle, videoAuthor) {
-    var thumbnail = [];
-    for(i = 0; i < playerResponse.videoDetails.thumbnail.thumbnails.length; i++) {
-        thumbnail[i] = {};
-        thumbnail[i].src = playerResponse.videoDetails.thumbnail.thumbnails[i].url;
-        thumbnail[i].sizes = playerResponse.videoDetails.thumbnail.thumbnails[i].width + 'x' + 
-                             playerResponse.videoDetails.thumbnail.thumbnails[i].height;
-        thumbnail[i].type = 'image/jpg';
-    };
+function setMediaSession(mediaInfo) {
     if ('mediaSession' in navigator) {
         navigator.mediaSession.metadata = new MediaMetadata({
-          title: videoTitle,
-          artist: videoAuthor,
+          title: mediaInfo.title,
+          artist: mediaInfo.author,
           album: '',
-          artwork: thumbnail
+          artwork: mediaInfo.thumbnail
         });
       
         navigator.mediaSession.setActionHandler('play', function() {
@@ -191,7 +193,7 @@ var playControl = {
             document.getElementById("title").style = "";
         };
         document.getElementById("description").innerHTML = obj.description;
-        setMediaSession(obj.title, playerResponse.videoDetails.author);
+        setMediaSession(obj);
         this.refresh();
     },
     prev: function() {
