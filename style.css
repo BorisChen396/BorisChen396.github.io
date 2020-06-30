@@ -26,5 +26,6 @@
 .playlist{
     width: 100%;
     height: fit-content;
-    max-height: calc(100% - 22px);
+    max-height: calc(90vh - 22px);
+    overflow-y: scroll;
 }
