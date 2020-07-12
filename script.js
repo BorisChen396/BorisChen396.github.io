@@ -51,6 +51,10 @@ function setVideoInfo(text) {
     };
     var obj = lookComponent();
     if(obj == -1) return;
+    setPlayerInfo(obj);
+}
+
+function setPlayerInfo(obj) {
     while(obj.title.indexOf("+") != -1) {
         obj.title = obj.title.replace("+", " ");
     };
@@ -200,7 +204,7 @@ var playControl = {
     play: function(item) {
         var tmp = this.currentItem;
         this.currentItem = item;
-        getVideoId(playlist[item].link);
+        playlist[this.currentItem].url ? setPlayerInfo(playlist[this.currentItem]) : getVideoId(playlist[item].link);
     },
     prev: function() {
         if(this.currentItem == 0) return;
