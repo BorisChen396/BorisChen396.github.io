@@ -191,8 +191,8 @@ var playControl = {
         var a = playlist.length;
         playlist[a] = {};
         playlist[a].link = link;
-        a == 0 ? this.play(a) : null;
         this.refresh();
+        a == 0 ? this.play(a) : null;
     },
     remove: function(item) {
         for(var i = item; i < playlist.length; i++) {
