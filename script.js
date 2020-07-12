@@ -9,7 +9,7 @@ var playlist = [];
 var playArrey;
 var loopMode = 0;
 
-function playMusic(link) {
+function getVideoId(link) {
     if(link.indexOf("youtu.be") != -1) {
         link = link.split("youtu.be/")[1].split("&")[0];
     }
@@ -18,44 +18,68 @@ function playMusic(link) {
     };
     video_id = link;
     file = cors_proxy + get_video_info + video_id;
+    getData(file, setVideoInfo);
+}
+
+function getData(link, thenFunction) {
     var fileReader = new XMLHttpRequest();
-    fileReader.open("GET", file, false);
-    fileReader.onreadystatechange = function() {
+    fileReader.open("GET", link);
+    fileReader.onload = function() {
         if(fileReader.readyState === 4) {
             if(fileReader.status === 200 || fileReader.status == 0) {
-                playerResponse = JSON.parse(decode(fileReader.responseText));
-                if(playerResponse.playabilityStatus.status != "OK") {
-                    alert(playerResponse.playabilityStatus.reason);
-                    return;
-                };
-                var obj = lookComponent();
-                if(obj == -1) return;
-                while(obj.title.indexOf("+") != -1) {
-                    obj.title = obj.title.replace("+", " ");
-                };
-                while(obj.description.indexOf("\n") != -1) {
-                    obj.description = obj.description.replace("\n", "<br/>");
-                };
-                while(obj.description.indexOf("+") != -1) {
-                    obj.description = obj.description.replace("+", " ");
-                };
-                while(obj.author.indexOf("+") != -1) {
-                    obj.author = obj.author.replace("+", " ");
-                };
-                playArrey = obj;
+                thenFunction(fileReader.responseText);
             }
         }
     }
-    try {
-        fileReader.send(null);
+    fileReader.onerror = function() {
+        alert(fileReader.statusText + "\n" + fileReader.reason);
     }
-    catch(e) {
-        alert("處理連結時發生例外。\nDetail: " + e);
+    try {
+        fileReader.send(null)
+    }
+    catch (e) {
+        alert(e);
         console.log(e);
-        return -1;
     };
-    playlist[playControl.currentItem] = playArrey;
-    return playArrey;
+}
+
+function setVideoInfo(text) {
+    playerResponse = JSON.parse(decode(text));
+    if(playerResponse.playabilityStatus.status != "OK") {
+        alert(playerResponse.playabilityStatus.reason);
+        return;
+    };
+    var obj = lookComponent();
+    if(obj == -1) return;
+    while(obj.title.indexOf("+") != -1) {
+        obj.title = obj.title.replace("+", " ");
+    };
+    while(obj.description.indexOf("\n") != -1) {
+        obj.description = obj.description.replace("\n", "<br/>");
+    };
+    while(obj.description.indexOf("+") != -1) {
+        obj.description = obj.description.replace("+", " ");
+    };
+    while(obj.author.indexOf("+") != -1) {
+        obj.author = obj.author.replace("+", " ");
+    };
+    document.getElementById("youtube-src").src = obj.url;
+    document.getElementById("youtube-src").type = obj.type;
+    document.getElementById("youtube-player").load();
+    document.getElementById("youtube-player").play();
+    document.title = obj.title;
+    document.getElementById("title").innerHTML = obj.title;
+    if(document.getElementById("title").clientWidth <= document.body.clientWidth*60/100) {
+        document.getElementById("title").style = "animation: none";
+    }
+    else {
+        document.getElementById("title").innerHTML = obj.title + obj.title;
+        document.getElementById("title").style = "";
+    };
+    document.getElementById("description").innerHTML = obj.description;
+    setMediaSession(obj);
+    playlist[playControl.currentItem] = obj;
+    playControl.refresh();
 }
 
 function decipher(num) {
@@ -155,6 +179,8 @@ function setMediaSession(mediaInfo) {
       }
 }
 
+
+
 var playControl = {
     currentItem: 0,
     add: function(link) {
@@ -174,27 +200,7 @@ var playControl = {
     play: function(item) {
         var tmp = this.currentItem;
         this.currentItem = item;
-        var obj = (playlist[item].url ? playlist[item] : playMusic(playlist[item].link));
-        if(obj == -1) {
-            this.currentItem = tmp;
-            return -1
-        };
-        document.getElementById("youtube-src").src = obj.url;
-        document.getElementById("youtube-src").type = obj.type;
-        document.getElementById("youtube-player").load();
-        document.getElementById("youtube-player").play();
-        document.title = obj.title;
-        document.getElementById("title").innerHTML = obj.title;
-        if(document.getElementById("title").clientWidth <= document.body.clientWidth*60/100) {
-            document.getElementById("title").style = "animation: none";
-        }
-        else {
-            document.getElementById("title").innerHTML = obj.title + obj.title;
-            document.getElementById("title").style = "";
-        };
-        document.getElementById("description").innerHTML = obj.description;
-        setMediaSession(obj);
-        this.refresh();
+        getVideoId(playlist[item].link);
     },
     prev: function() {
         if(this.currentItem == 0) return;
