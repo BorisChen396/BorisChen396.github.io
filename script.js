@@ -8,16 +8,9 @@ var playerResponse;
 var playlist = [];
 var playArrey;
 var loopMode = 0;
-var qualitySet = "AUDIO_QUALITY_LOW";
+var qualitySet = "AUDIO_QUALITY_MEDIUM";
 
-function getVideoId(link) {
-    if(link.indexOf("youtu.be") != -1) {
-        link = link.split("youtu.be/")[1].split("&")[0];
-    }
-    else {
-        link = link.split("v=")[1].split("&")[0];
-    };
-    video_id = link;
+function getVideoId(video_id) {
     file = cors_proxy + get_video_info + video_id;
     getData(file, setVideoInfo);
 }
@@ -28,7 +21,7 @@ function getData(link, thenFunction) {
     fileReader.onload = function() {
         if(fileReader.readyState === 4) {
             if(fileReader.status === 200 || fileReader.status == 0) {
-                thenFunction(fileReader.responseText);
+                if(thenFunction) thenFunction(fileReader.responseText);
             }
         }
     }
@@ -53,7 +46,11 @@ function setVideoInfo(text) {
     var obj = lookComponent();
     if(obj == -1) return;
     setPlayerInfo(obj);
-    getInfoFromAPI("videos", playerResponse.videoDetails.videoId, "snippet", setVideoInfoFromAPI);
+    var tags = {
+        id: playerResponse.videoDetails.videoId,
+        part: "snippet"
+    }
+    getInfoFromAPI("videos", tags, setVideoInfoFromAPI);
 }
 
 function setPlayerInfo(obj) {
@@ -65,9 +62,13 @@ function setPlayerInfo(obj) {
     playControl.refresh();
 }
 
-function getInfoFromAPI(ref, id, part, thenFunction) {
+function getInfoFromAPI(ref, tags, thenFunction) {
     var key = "AIzaSyCJecgTtdDpk76QLDM67uFSHaqsQpjUI9k";
-    var link = "https://www.googleapis.com/youtube/v3/" + ref + "?key=" + key + "&id=" + id + "&part=" + part;
+    var _tags = "";
+    for(var i = 0; i < Object.keys(tags).length; i++) {
+        _tags = _tags + "&" + Object.keys(tags)[i] + "=" + tags[Object.keys(tags)[i]];
+    };
+    var link = "https://www.googleapis.com/youtube/v3/" + ref + "?key=" + key + _tags;
     getData(link, thenFunction);
 }
 
@@ -176,12 +177,30 @@ var playlistItem;
 
 var playControl = {
     currentItem: 0,
-    add: function(link) {
+    add: function(videoId) {
         var a = playlist.length;
         playlist[a] = {};
-        playlist[a].link = link;
+        playlist[a].videoId = videoId;
         this.refresh();
         a == 0 ? this.play(a) : null;
+    },
+    addPlaylist: function(playlistId) {
+        var tags = {
+            playlistId: playlistId,
+            part: "snippet,id"
+        }
+        getInfoFromAPI("playlistItems", tags, function test(text) {
+            text = JSON.parse(text);
+            while(text.nextPageToken) {
+                var tags = {
+                    playlistId: playlistId,
+                    part: "snippet,id",
+                    pageToken: text.nextPageToken
+                };
+                getInfoFromAPI("playlistItems", tags, test());
+            };
+            console.log(text);
+        });
     },
     remove: function(item) {
         for(var i = item; i < playlist.length; i++) {
@@ -192,9 +211,8 @@ var playControl = {
     },
     play: function(item) {
         if(String(item).indexOf("playlistItem_") >= 0) {item = Number(item.replace("playlistItem_", ""))};
-        var tmp = this.currentItem;
         this.currentItem = item;
-        playlist[this.currentItem].url ? setPlayerInfo(playlist[this.currentItem]) : getVideoId(playlist[item].link);
+        playlist[this.currentItem].url ? setPlayerInfo(playlist[this.currentItem]) : getVideoId(playlist[item].videoId);
     },
     prev: function() {
         if(this.currentItem == 0) return;
@@ -228,7 +246,7 @@ var playControl = {
                 playlistItem[5] = playlist[i].title;
             }
             else {
-                playlistItem[5] = playlist[i].link;
+                playlistItem[5] = "https://youtu.be/" + playlist[i].videoId;
             };
             if(i == this.currentItem) {
                 playlistItem[3] = "";
@@ -239,7 +257,6 @@ var playControl = {
                 playlistItem[3] = "cursor: pointer;";
                 playlistItem[1] = "playControl.play(" + i + ")";
             };
-            console.log(playlistItem.join(""));
             document.getElementById("playlist").innerHTML = document.getElementById("playlist").innerHTML + playlistItem.join("");
         };
     },
@@ -256,4 +273,13 @@ function loopSwitch() {
     if(loopMode == 0) document.getElementById("loopSwitch").innerHTML = "none";
     if(loopMode == 1) document.getElementById("loopSwitch").innerHTML = "single";
     if(loopMode == 2) document.getElementById("loopSwitch").innerHTML = "queue";
+}
+
+function stringSplit(string) {
+    string = string.split("&");
+    var a = {};
+    for(var i = 0; i < string.length; i++) {
+        a[string[i].split("=")[0]] = string[i].split("=")[1];
+    };
+    return a;
 }

@@ -14,7 +14,10 @@
             function addLink() {
                 var link = document.getElementById('video-id').value.split(";");
                 for(var i = 0; i < link.length; i++) {
-                    playControl.add(link[i]);
+                    link[i] = link[i].replace("youtu.be/", "www.youtube.com/watch?v=");
+                    link[i] = stringSplit(link[i].split("?")[1]);
+                    link[i].list ? playControl.addPlaylist(link[i].list) : null;
+                    link[i].v ? playControl.add(link[i].v) : null;
                 };
             }
             function setTitleAnimation(title) {
@@ -45,7 +48,7 @@
             <p id="description" class="description"></p>
         </div>
         <div style="position: fixed; top: 5px; right: 5px; width: 40%; height: 100%-5px">
-            <input id="video-id" style="height: 22px; position: relative; left: 0%; width: 75%;" value="https://www.youtube.com/watch?v=y5wkebBCwAE"></input>
+            <input id="video-id" style="height: 22px; position: relative; left: 0%; width: 75%;" value="https://www.youtube.com/playlist?list=PLapAWzQrqRIwygIO0AyOudSWYUvHIHNZH"></input>
             <button onclick="addLink()" style="height: 22px; width: 20%;">run!</button>
             <div id="playlist" class="playlist"></div>
         </div>
