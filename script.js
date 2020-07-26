@@ -1,6 +1,6 @@
 var cors_proxy = "https://cors-anywhere.herokuapp.com/";
 var get_video_info = "https://www.youtube.com/get_video_info?eurl=" + encodeURIComponent(window.location) + 
-                     "&sts=18432&html5=1&video_id=";
+                     "&sts=18466&html5=1&video_id=";
 var video_id = "";
 var file = ""
 var fileContent = "null";
@@ -8,6 +8,7 @@ var playerResponse;
 var playlist = [];
 var playArrey;
 var loopMode = 0;
+var qualitySet = "AUDIO_QUALITY_LOW";
 
 function getVideoId(link) {
     if(link.indexOf("youtu.be") != -1) {
@@ -52,65 +53,66 @@ function setVideoInfo(text) {
     var obj = lookComponent();
     if(obj == -1) return;
     setPlayerInfo(obj);
+    getInfoFromAPI("videos", playerResponse.videoDetails.videoId, "snippet", setVideoInfoFromAPI);
 }
 
 function setPlayerInfo(obj) {
-    while(obj.title.indexOf("+") != -1) {
-        obj.title = obj.title.replace("+", " ");
-    };
-    while(obj.description.indexOf("\n") != -1) {
-        obj.description = obj.description.replace("\n", "<br/>");
-    };
-    while(obj.description.indexOf("+") != -1) {
-        obj.description = obj.description.replace("+", " ");
-    };
-    while(obj.author.indexOf("+") != -1) {
-        obj.author = obj.author.replace("+", " ");
-    };
-    document.getElementById("youtube-src").src = obj.url;
-    document.getElementById("youtube-src").type = obj.type;
+    document.getElementById("youtube-player").src = obj.url;
+    document.getElementById("youtube-player").type = obj.type;
     document.getElementById("youtube-player").load();
     document.getElementById("youtube-player").play();
-    document.title = obj.title;
-    document.getElementById("title").innerHTML = obj.title;
-    if(document.getElementById("title").clientWidth <= document.body.clientWidth*60/100) {
-        document.getElementById("title").style = "animation: none";
-    }
-    else {
-        document.getElementById("title").innerHTML = obj.title + obj.title;
-        document.getElementById("title").style = "";
-    };
-    document.getElementById("description").innerHTML = obj.description;
-    setMediaSession(obj);
-    playlist[playControl.currentItem] = obj;
+    playlist[playControl.currentItem] = Object.assign(playlist[playControl.currentItem], obj);
     playControl.refresh();
 }
+
+function getInfoFromAPI(ref, id, part, thenFunction) {
+    var key = "AIzaSyCJecgTtdDpk76QLDM67uFSHaqsQpjUI9k";
+    var link = "https://www.googleapis.com/youtube/v3/" + ref + "?key=" + key + "&id=" + id + "&part=" + part;
+    getData(link, thenFunction);
+}
+
+function setVideoInfoFromAPI(APIText) {
+    var videoInfo = JSON.parse(APIText).items[0].snippet;
+    document.title = videoInfo.title;
+    playlist[playControl.currentItem] = Object.assign(playlist[playControl.currentItem], videoInfo);
+    setTitleAnimation(videoInfo.title);
+    document.getElementById("description").innerHTML = videoInfo.description.replace(/\n/g, "<br/>");
+    videoInfo.thumbnails = [videoInfo.thumbnails.default, videoInfo.thumbnails.high,
+                            videoInfo.thumbnails.medium, videoInfo.thumbnails.standard]
+    for(var i = 0; i < videoInfo.thumbnails.length; i++) {
+        videoInfo.thumbnails[i].sizes = videoInfo.thumbnails[i].width + "x" + videoInfo.thumbnails[i].height;
+        videoInfo.thumbnails[i].type = "image/jpg";
+        videoInfo.thumbnails[i].src = videoInfo.thumbnails[i].url + "?sqp=-oaymwEYCKgBEF5IVfKriqkDCwgBFQAAiEIYAXAB";
+    };
+    setMediaSession(videoInfo);
+    playControl.refresh();
+}
+
+var Zu = function(a) {
+    a = a.split("");
+    Yu.QC(a, 39);
+    Yu.oN(a, 77);
+    Yu.QC(a, 20);
+    return a.join("")
+};
+var Yu = {
+    oN: function(a) {
+        a.reverse()
+    },
+    QC: function(a, b) {
+        var c = a[0];
+        a[0] = a[b % a.length];
+        a[b % a.length] = c
+    },
+    mI: function(a, b) {
+        a.splice(0, b)
+    }
+};
 
 function decipher(num) {
     var s = decodeURIComponent(playerResponse.streamingData.adaptiveFormats[num].signatureCipher.split("&")[0].split("s=")[1]);
     var url = decodeURIComponent(playerResponse.streamingData.adaptiveFormats[num].signatureCipher.split("&")[2].split("url=")[1]);
-    var Ew = function(a) {
-        a = a.split("");
-        Dw.h3(a, 22);
-        Dw.yE(a, 1);
-        Dw.h3(a, 64);
-        Dw.Qg(a, 28);
-        return a.join("")
-    };
-    var Dw = {
-        h3: function(a) {
-            a.reverse()
-        },
-        yE: function(a, b) {
-            a.splice(0, b)
-        },
-        Qg: function(a, b) {
-            var c = a[0];
-            a[0] = a[b % a.length];
-            a[b % a.length] = c
-        }
-    };
-    return (url + "&sig=" + encodeURIComponent(Ew(s)));
+    return (url + "&sig=" + encodeURIComponent(Zu(s)));
 }
 
 function decode(content) {
@@ -124,30 +126,17 @@ function decode(content) {
 
 function lookComponent() {
     for(i = 0; i < playerResponse.streamingData.adaptiveFormats.length; i++) {
-        if(playerResponse.streamingData.adaptiveFormats[i].audioQuality == "AUDIO_QUALITY_MEDIUM") {
-            var obj = {"url": null, 
-            "type": null,
-            "title": null, 
-            "author": null,
-            "description": null,
-            "thumbnail": [],};
+        if(playerResponse.streamingData.adaptiveFormats[i].audioQuality == qualitySet) {
+            var obj = [{"url": null,
+                       "type": null
+            }];
             if  (playerResponse.streamingData.adaptiveFormats[i].signatureCipher != undefined) {
                 obj.url = decipher(i);
             }
             else {
                 obj.url = playerResponse.streamingData.adaptiveFormats[i].url;
             };
-            obj.type = playerResponse.streamingData.adaptiveFormats[i].mimeType;
-            obj.title =  playerResponse.videoDetails.title;
-            obj.description = playerResponse.videoDetails.shortDescription;
-            obj.author = playerResponse.videoDetails.author;
-            for(i = 0; i < playerResponse.videoDetails.thumbnail.thumbnails.length; i++) {
-                obj.thumbnail[i] = {};
-                obj.thumbnail[i].src = playerResponse.videoDetails.thumbnail.thumbnails[i].url;
-                obj.thumbnail[i].sizes = playerResponse.videoDetails.thumbnail.thumbnails[i].width + 'x' + 
-                                     playerResponse.videoDetails.thumbnail.thumbnails[i].height;
-                obj.thumbnail[i].type = 'image/jpg';
-            };
+            obj.type = playerResponse.streamingData.adaptiveFormats[i].mimeType.split(";")[0];
             return obj;
         };
     };
@@ -157,9 +146,9 @@ function setMediaSession(mediaInfo) {
     if ('mediaSession' in navigator) {
         navigator.mediaSession.metadata = new MediaMetadata({
           title: mediaInfo.title,
-          artist: mediaInfo.author,
+          artist: mediaInfo.channelTitle,
           album: '',
-          artwork: mediaInfo.thumbnail
+          artwork: mediaInfo.thumbnails
         });
       
         navigator.mediaSession.setActionHandler('play', function() {
@@ -183,7 +172,7 @@ function setMediaSession(mediaInfo) {
       }
 }
 
-
+var playlistItem;
 
 var playControl = {
     currentItem: 0,
@@ -202,27 +191,17 @@ var playControl = {
         this.refresh();
     },
     play: function(item) {
+        if(String(item).indexOf("playlistItem_") >= 0) {item = Number(item.replace("playlistItem_", ""))};
         var tmp = this.currentItem;
         this.currentItem = item;
         playlist[this.currentItem].url ? setPlayerInfo(playlist[this.currentItem]) : getVideoId(playlist[item].link);
     },
     prev: function() {
         if(this.currentItem == 0) return;
-        var tmpurl = document.getElementById("youtube-src").src;
-        var tmptime = document.getElementById("youtube-player").currentTime;
         document.getElementById("youtube-player").src = "";
-        var stat = this.play(this.currentItem - 1);
-        if(stat == -1) {
-            playlist[this.currentItem] = undefined;
-            this.currentItem++;
-            document.getElementById("youtube-player").src = tmpurl;
-            document.getElementById("youtube-player").currentTime = tmptime;
-            document.getElementById("youtube-player").play();
-            this.refresh();
-        };
+        this.play(this.currentItem - 1);
     },
     next: function() {
-        document.getElementById("youtube-src").src = "";
         if(loopMode == 1) {
             document.getElementById("youtube-player").currentTime = 0;
             document.getElementById("youtube-player").play();
@@ -232,17 +211,8 @@ var playControl = {
             this.currentItem = -1;
         };
         if(this.currentItem == playlist.length - 1) return;
-        var tmpurl = document.getElementById("youtube-src").src;
-        var tmptime = document.getElementById("youtube-player").currentTime;
-        var stat = this.play(this.currentItem + 1);
-        if(stat == -1) {
-            playlist[this.currentItem] = undefined;
-            this.currentItem--;
-            document.getElementById("youtube-src").src = tmpurl;
-            document.getElementById("youtube-player").currentTime = tmptime;
-            document.getElementById("youtube-player").play();
-            this.refresh();
-        };
+        document.getElementById("youtube-player").src = "";
+        this.play(this.currentItem + 1);
     },
     clear: function() {
         playlist = [];
@@ -251,20 +221,26 @@ var playControl = {
     refresh: function() {
         document.getElementById("playlist").innerHTML = "";
         for(var i = 0; i < playlist.length; i++) {
-            if(i == this.currentItem) {
-                document.getElementById("playlist").innerHTML = document.getElementById("playlist").innerHTML + 
-                                                                "<i>" + playlist[i].title + "</i>";
-            }
-            else if(playlist[i].title){
-                document.getElementById("playlist").innerHTML = document.getElementById("playlist").innerHTML + 
-                                                                "<div class='playlistItem'><a style='cursor: pointer' onclick='playControl.play(" + 
-                                                                i + ")'>" + playlist[i].title + "</a></div><br/>";
+            //playlistItem[1] = onclick, [3] = style, [5] = innerHTML
+            playlistItem = ["<div class='playlistItem' id='playlistItem_" + i + "' onclick='", "", "' style='", "", "'>", "", "</div>"];
+
+            if(playlist[i].title){
+                playlistItem[5] = playlist[i].title;
             }
             else {
-                document.getElementById("playlist").innerHTML = document.getElementById("playlist").innerHTML + 
-                                                                "<div class='playlistItem'><a style='cursor: pointer' onclick='playControl.play(" + 
-                                                                i + ")'>" + playlist[i].link + "</a></div><br/>";
+                playlistItem[5] = playlist[i].link;
             };
+            if(i == this.currentItem) {
+                playlistItem[3] = "";
+                playlistItem[5] = "<i>" + playlistItem[5] + "</i>";
+                playlistItem[1] = "";
+            }
+            else {
+                playlistItem[3] = "cursor: pointer;";
+                playlistItem[1] = "playControl.play(" + i + ")";
+            };
+            console.log(playlistItem.join(""));
+            document.getElementById("playlist").innerHTML = document.getElementById("playlist").innerHTML + playlistItem.join("");
         };
     },
     savePlaylist: function() {

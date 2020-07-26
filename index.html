@@ -3,9 +3,10 @@
         <title>YouTube Online Music Player</title>
         <link type="text/css" rel="stylesheet" href="style.css">
     </head>
-    <body>
+    <body onresize="setTitleAnimation(videoTitle)">
         <script src="script.js"></script>
         <script>
+            var videoTitle;
             function reloadPlayer() {
                 document.getElementById('youtube-player').load();
                 document.getElementById('youtube-player').play();
@@ -16,9 +17,23 @@
                     playControl.add(link[i]);
                 };
             }
+            function setTitleAnimation(title) {
+                videoTitle = title;
+                if(!videoTitle) return;
+                document.getElementById("title").innerHTML = videoTitle;
+                if(document.getElementById("title").clientWidth <= document.body.clientWidth*60/100) {
+                    document.getElementById("title").style = "animation: none";
+                }
+                else {
+                    document.getElementById("title").innerHTML = playlist[playControl.currentItem].title + playlist[playControl.currentItem].title;
+                    document.getElementById("title").style = "";
+                };
+            }
+            function playlistItemPlay() {
+                playControl.play(this.id);
+            }
         </script>
         <audio id="youtube-player" onended="playControl.next()" controls autoplay>
-            <source id="youtube-src"></source>
         </audio>
         <button onclick="reloadPlayer()">reload</button>
         <button id="loopSwitch" onclick="loopSwitch()">none</button>
