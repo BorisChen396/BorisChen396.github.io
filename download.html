@@ -1,2 +1,29 @@
 <html>
+    <body>
+        If your download didn't start automatically, 
+        <a id="link">click here</a>.
+    </body>
+    <script>
+        var request = new URL(window.location.href).searchParams.get("req");
+        
+        document.body.onload = function() {
+            switch(request) {
+                case "android-pudding":
+                    var xhr = new XMLHttpRequest();
+                    xhr.open("GET", "https://raw.githubusercontent.com/BorisChen396/PuddingPlayer/master/VERSION");
+                    xhr.onerror = function() {
+                        var msg = "Error " + xhr.status + ": " + xhr.statusText;
+                        alert("An error has occurred. Please try again later.\n" + msg)
+                        window.close()
+                    }
+                    xhr.onload = function() {
+                        var p = new URLSearchParams(xhr.responseText);
+                        window.open(p.get("apk-url"), "_self");
+                        document.getElementById("link").setAttribute("href", p.get("apk-url"));
+                    }
+                    xhr.send();
+                    break;
+            }
+        }
+    </script>
 </html>
