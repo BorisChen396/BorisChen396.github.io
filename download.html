@@ -20,6 +20,8 @@
                         var p = new URLSearchParams(xhr.responseText);
                         window.open(p.get("apk-url"), "_self");
                         document.getElementById("link").setAttribute("href", p.get("apk-url"));
+                        var name = p.get("apk-url").split("/")[p.get("apk-url").split("/").length - 1];
+                        document.title = "Downloading " + name;
                     }
                     xhr.send();
                     break;
