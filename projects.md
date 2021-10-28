@@ -7,4 +7,4 @@ has_children: true
 
 # Projects
 
-Here is all of the projects I'm working on.
+Here is all the projects I'm working on.
