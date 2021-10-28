@@ -10,11 +10,12 @@ parent: Projects
 Pudding is a music player that let you enjoy music from various sources!
 
 [Download latest][get-latest]{: .btn .btn-primary}&nbsp;
-[Download other versions][get-old]{: .btn}
+[Download other versions][get-old]{: .btn}&nbsp;
+[View source code][https://github.com/BorisChen396/Pudding]
 
 ## Installation
 
-Pudding currently only works on Android Lollipop or higher. You can get the latest version [here][get-latest], or find other versions [here][get-old].
+Pudding currently only works on Android Lollipop or higher.  You can get latest version [here][get-latest], or find other versions [here][get-old].
 
 ## Supported sources
 
