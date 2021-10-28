@@ -6,9 +6,9 @@ parent: Projects
 ---
 
 # Pudding
-[View source code](https://github.com/BorisChen396/Pudding)
 
-Pudding is a music player that let you enjoy music from various sources!
+Pudding is a open-source music player that let you enjoy music from various sources!
+[View source code](https://github.com/BorisChen396/Pudding)
 
 [Download latest][get-latest]{: .btn .btn-primary}&nbsp;
 [Download other versions][get-old]{: .btn}
