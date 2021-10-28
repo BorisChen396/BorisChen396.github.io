@@ -11,7 +11,7 @@ Pudding is a music player that let you enjoy music from various sources!
 
 [Download latest][get-latest]{: .btn .btn-primary}&nbsp;
 [Download other versions][get-old]{: .btn}&nbsp;
-[View source code][https://github.com/BorisChen396/Pudding]
+[View source code](https://github.com/BorisChen396/Pudding)
 
 ## Installation
 
