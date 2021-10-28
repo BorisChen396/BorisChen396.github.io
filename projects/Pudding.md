@@ -14,7 +14,7 @@ Pudding is a music player that let you enjoy music from various sources!
 
 ## Installation
 
-Pudding currently only works on Android Lollipop or higher.  You can get the latest version [here][get-latest], or find other versions [here][get-old].
+Pudding currently only works on Android Lollipop or higher. You can get the latest version [here][get-latest], or find other versions [here][get-old].
 
 ## Supported sources
 
