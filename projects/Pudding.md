@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Projects
+title: Pudding
 nav_order: 1
 parent: Projects
 ---
