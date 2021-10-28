@@ -9,8 +9,8 @@ parent: Projects
 
 Pudding is a music player that let you enjoy music from various sources!
 
-[Download latest][get-latest]&nbsp;
-[Download other versions][get-old]
+[Download latest][get-latest]{.btn .btn-primary}&nbsp;
+[Download other versions][get-old]{.btn}
 
 ## Installation
 
