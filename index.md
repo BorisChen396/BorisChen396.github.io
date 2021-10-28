@@ -6,4 +6,4 @@ Welcome to my website! This website is used to organize my projects. You can fin
 ## Projects
 
 Here is the list of the projects I'm working on.  
- 1. [Pudding](/projects/Pudding)
+ 1. [Pudding](/Pudding)
