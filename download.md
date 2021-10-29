@@ -1,5 +1,7 @@
 ---
 layout: default
+title: Download
+nav_exclude: true
 ---
 
 # Download
