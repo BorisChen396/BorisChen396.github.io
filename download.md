@@ -2,6 +2,7 @@
 layout: default
 title: Download
 nav_exclude: true
+search_exclude: true
 ---
 
 # Download
