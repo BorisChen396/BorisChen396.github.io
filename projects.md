@@ -6,3 +6,5 @@ has_children: true
 ---
 
 # Projects
+
+This page shows all my projects on GitHub.
