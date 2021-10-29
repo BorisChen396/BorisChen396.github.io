@@ -26,5 +26,5 @@ Pudding currently only works on Android Lollipop or higher. You can get the late
 
 The icon is created by zELiaNUze with ❤️.
 
-[get-latest]:javascript:fetch("https://api.github.com/repositories/367643669/releases/latest").then(response=>{response.json().then(json=>{window.location.href=json.assets[json.assets.length-1].browser_download_url})});
+[get-latest]:/download?req=android-pudding
 [get-old]:javascript:if(confirm("Old\u0020versions\u0020may\u0020not\u0020be\u0020usable\u0020because\u0020of\u0020bugs\u0020or\u0020other\u0020problems.\u0020Continue?"))window.location.href="https://github.com/BorisChen396/Pudding/releases";
