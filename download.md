@@ -1,3 +1,7 @@
+---
+layout: default
+---
+
 # Download
 
 If your download doesn't start in a few seconds, [click here](javascript: document.body.onload()).
