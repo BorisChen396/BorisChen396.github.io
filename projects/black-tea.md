@@ -7,7 +7,7 @@ parent: Projects
 
 # Black Tea
 
-Black Tea is a Discord music bot that can play various sources through [youtube-dl][https://github.com/ytdl-org/youtube-dl].
+Black Tea is a Discord music bot that can play various sources through [youtube-dl](https://github.com/ytdl-org/youtube-dl).
 [View source code](https://github.com/BorisChen396/black-tea)
 
 [Add to your Discord server][add-to-server]{: .btn .btn-primary}
