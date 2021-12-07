@@ -20,6 +20,8 @@ parent: Blogs
 
 使用新的圖示。
 
+![Dialog screenshot] (20211207-pudding-1.jpg)
+
 ### 播放服務
 
 新增Track物件作為項目的基礎物件，方便後續新增其他平台的支援。
