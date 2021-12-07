@@ -12,7 +12,7 @@ parent: Blogs
 
 ### UI介面
 
-介面採用Google最新的Material 3進行設計，程式會自動使用系統色彩(Android 12以上)，否則預設會黃色色彩主題。
+介面採用Google最新的Material 3重新進行設計，程式會自動使用系統色彩(Android 12以上)，否則預設會黃色色彩主題。
 
 新增播放清單功能。
 
