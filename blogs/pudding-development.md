@@ -20,7 +20,7 @@ parent: Blogs
 
 使用新的圖示。
 
-![Dialog screenshot] (20211207-pudding-1.jpg)
+![Dialog screenshot](20211207-pudding-1.jpg "Material 3 對話框")
 
 ### 播放服務
 
