@@ -8,3 +8,4 @@ has_children: true
 # Blogs
 
 My projects' development progress records.
+Note: Blogs are written in Chinese.
