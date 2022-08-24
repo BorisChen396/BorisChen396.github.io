@@ -13,9 +13,9 @@ Pudding is an open-source music player that let you enjoy music from various sou
 [Download latest][get-latest]{: .btn .btn-primary}&nbsp;
 [Download other versions][get-old]{: .btn}
 
-## Installation
+## Requirements
 
-Pudding currently only works on Android Lollipop or higher. You can get the latest version [here][get-latest], or find other versions [here][get-old].
+ - Android 5.0+
 
 ## Supported sources
 
